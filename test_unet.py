@@ -21,7 +21,7 @@ from tqdm import tqdm
 
 from train_unet import MRIDataset
 
-
+""" Function to calculate Dice similarity between images"""
 def calculate_dice_score(preds, targets, smooth=1e-6):
     """
     preds: tensor of shape (B, 1, H, W) with values 0 or 1
@@ -44,12 +44,12 @@ def calculate_dice_score(preds, targets, smooth=1e-6):
 if __name__=="__main__":
     unet_model=UNET(3,1)
     print(unet_model)
-    unet_model.load_state_dict(torch.load('/home/kuka/Harsh Stuff/Unet-Mri/saves/unet_model_epoch_99.pth', map_location=torch.device('cpu')))
+    unet_model.load_state_dict(torch.load('saves/unet_model_epoch_99.pth', map_location=torch.device('cpu')))
 
     device="cuda" if torch.cuda.is_available() else "cpu"
     unet_model.to(device)
 
-    root_dir="/home/kuka/Harsh Stuff/MRI Dataset Kaggle/archive/kaggle_3m"
+    root_dir="path/"
     dirs=os.listdir(root_dir)
     
     total_data_x=[]
@@ -69,8 +69,8 @@ if __name__=="__main__":
             total_data_x.append(img_x)
             total_data_y.append(img_y)
 
-
-    filename = '/home/kuka/Harsh Stuff/Unet-Mri/test_indices.pkl'
+    # Loading the test indices generated while training
+    filename = '/test_indices.pkl'
     test_indx = []
 
     with open(filename, 'rb') as file:
@@ -99,7 +99,7 @@ if __name__=="__main__":
     with torch.no_grad():
         for batch_idx, (img, mask) in enumerate(tqdm(test_loader)):
             img = img.to(device)
-            mask = mask.to(device) # Ensure mask is on GPU
+            mask = mask.to(device)
             
             # 1. Forward Pass
             outputs = unet_model(img)
